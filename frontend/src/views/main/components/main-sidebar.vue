@@ -40,6 +40,7 @@
 import { reactive, computed } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
+import { ElLoading } from 'element-plus'
 
 export default {
   name: 'main-header',
@@ -81,9 +82,17 @@ export default {
       store.commit('menuStore/setMenuActive', param)
       const MenuItems = store.getters['menuStore/getMenus']
       let keys = Object.keys(MenuItems)
+
+      const loadingInstance = ElLoading.service({
+        lock: true,
+        text: 'Loading',
+        background: 'rgba(0, 0, 0, 0.7)',
+      })
       router.push({
         name: keys[param]
       })
+      loadingInstance.close()
+
     }
 
     return { state, menuSelect }

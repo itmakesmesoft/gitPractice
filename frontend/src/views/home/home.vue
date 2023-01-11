@@ -34,34 +34,35 @@
 import Conference from './components/conference'
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElLoading } from 'element-plus'
 
 export default {
   name: 'Home',
-
   components: {
     Conference
   },
-
   setup () {
     const router = useRouter()
-
     const state = reactive({
       count: 12
     })
-
     const load = function () {
       state.count += 4
     }
-
     const clickConference = function (id) {
+      const loadingInstance = ElLoading.service({
+        lock: true,
+        text: 'Loading',
+        background: 'rgba(0, 0, 0, 0.7)',
+      })
       router.push({
         name: 'conference-detail',
         params: {
           conferenceId: id
         }
       })
+      loadingInstance.close()
     }
-
     return { state, load, clickConference }
   }
 }
