@@ -67,6 +67,7 @@
 <script>
 import { reactive, computed, ref, onMounted } from 'vue'
 import { useStore } from 'vuex'
+import { ElLoading, FormInstance } from 'element-plus'
 
 export default {
   name: 'register-dialog',
@@ -146,8 +147,20 @@ export default {
       // 로그인 클릭 시 validate 체크 후 그 결과 값에 따라, 로그인 API 호출 또는 경고창 표시
       registerForm.value.validate(async (valid) => {
         if (valid) {
+          const loadingInstance = ElLoading.service({
+            lock: true,
+            text: 'Loading',
+            background: 'rgba(0, 0, 0, 0.7)',
+          })
           console.log('submit')
-          await store.dispatch('accountStore/registerAction', { id: state.form.id, password: state.form.password, name:state.form.name, position: state.form.position, department: state.form.department })
+          await store.dispatch('accountStore/registerAction', {
+            id: state.form.id,
+            password: state.form.password,
+            name:state.form.name,
+            position: state.form.position,
+            department: state.form.department
+          })
+          loadingInstance.close()
         } else {
           alert('Validate error!')
         }
