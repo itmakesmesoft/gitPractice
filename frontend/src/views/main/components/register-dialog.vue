@@ -146,14 +146,12 @@ export default {
     const clickRegister = function () {
       // 로그인 클릭 시 validate 체크 후 그 결과 값에 따라, 로그인 API 호출 또는 경고창 표시
       registerForm.value.validate(async (valid) => {
-
-        const loadingInstance = ElLoading.service({
-          lock: true,
-          text: 'Loading',
-          background: 'rgba(0, 0, 0, 0.7)',
-        })
-
         if (valid) {
+          const loadingInstance = ElLoading.service({
+            lock: true,
+            text: 'Loading',
+            background: 'rgba(0, 0, 0, 0.7)',
+          })
           console.log('submit')
           await store.dispatch('accountStore/registerAction', {
             id: state.form.id,
@@ -162,7 +160,7 @@ export default {
             position: state.form.position,
             department: state.form.department
           })
-          loadingInstance.close() // 이게 맞나요?ㅋ
+          loadingInstance.close()
         } else {
           alert('Validate error!')
         }
