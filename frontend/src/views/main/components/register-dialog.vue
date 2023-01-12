@@ -116,7 +116,14 @@ export default {
           { max: 16, message: '최대 30자까지 입력 가능합니다.', trigger: 'blur'}
         ],
         password: [
-          { required: true, message: 'Please input password', trigger: 'blur' },
+          { required: true, message: '영문, 숫자, 특수문자가 조합되어야 합니다.',
+              trigger: 'blur', validator (rule, value, callback) {
+              if (/^.(?=^)(?=.\d)(?=.[a-zA-Z])(?=.[!@#$%^&+=]).*$/.test(value)) {
+
+              } else {
+                callback(new Error('영문, 숫자, 특수문자가 조합되어야 합니다.'))
+              }
+          }},
           { max: 16, message: '최대 16자까지 입력 가능합니다.', trigger: 'blur'},
           { min: 9, message: '최소 9자를 입력 해야합니다.', trigger: 'blur'}
         ],
@@ -125,6 +132,7 @@ export default {
           { max: 16, message: '최대 16자까지 입력 가능합니다.', trigger: 'blur'},
           { min: 9, message: '최소 9자를 입력 해야합니다.', trigger: 'blur'}
         ]
+
       },
       dialogVisible: computed(() => props.open),
       formLabelWidth: '120px'
