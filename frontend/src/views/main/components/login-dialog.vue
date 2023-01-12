@@ -2,10 +2,10 @@
   <el-dialog custom-class="login-dialog" title="로그인" v-model="state.dialogVisible" @close="handleClose">
     <el-form :model="state.form" :rules="state.rules" ref="loginForm" :label-position="state.form.align">
       <el-form-item prop="id" label="아이디" :label-width="state.formLabelWidth" >
-        <el-input v-model="state.form.id" autocomplete="off"></el-input>
+        <el-input v-model="state.form.id" @input="onChange()" autocomplete="off"></el-input>
       </el-form-item>
       <el-form-item prop="password" label="비밀번호" :label-width="state.formLabelWidth">
-        <el-input v-model="state.form.password" autocomplete="off" show-password></el-input>
+        <el-input v-model="state.form.password"  @input="onChange()" autocomplete="off" show-password></el-input>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -82,11 +82,21 @@ export default {
       },
       rules: {
         id: [
-          { required: true, message: 'Please input ID', trigger: 'blur' }
+          { required: true, message: 'Please input ID', trigger: 'blur' },
+          { max: 16, message: '최대 16자까지 입력 가능합니다.', trigger: 'blur'}
         ],
         password: [
-          { required: true, message: 'Please input password', trigger: 'blur' }
-        ]
+          { trigger: 'blur', validator (rule, value, callback) {
+            if (/^.*(?=^)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/.test(value)) {
+              callback();
+            } else {
+              callback(new Error('비밀번호는 영문, 숫자, 특수문자가 조합되어야 합니다.'))
+            }
+          }},
+          { required: true, message: 'Please input password', trigger: 'blur' },
+          { max: 16, message: '최대 16자까지 입력 가능합니다.', trigger: 'blur'},
+          { min: 9, message: '최소 9자를 입력 해야합니다.', trigger: 'blur'}
+        ],
       },
       dialogVisible: computed(() => props.open),
       formLabelWidth: '120px'
@@ -95,32 +105,34 @@ export default {
     onMounted(() => {
       // console.log(loginForm.value)
     })
+    const onChange = function() {
+      loginForm.value.validate(async () => {
+        await console.log()
+      })
+    }
 
     const clickLogin = function () {
       // 로그인 클릭 시 validate 체크 후 그 결과 값에 따라, 로그인 API 호출 또는 경고창 표시
       loginForm.value.validate(async (valid) => {
-
+        const loadingInstance = ElLoading.service({
+          lock: true,
+          text: 'Loading',
+          background: 'rgba(0, 0, 0, 0.7)',
+        })
         if (valid) {
-          const loadingInstance = ElLoading.service({
-            lock: true,
-            text: 'Loading',
-            background: 'rgba(0, 0, 0, 0.7)',
-          })
           console.log('submit')
           await store.dispatch('accountStore/loginAction', { id: state.form.id, password: state.form.password })
           console.log('local')
           await localStorage.setItem('token',store.getters['accountStore/getToken'] )
           console.log('getme')
           await store.dispatch('accountStore/getMeAction', store.getters['accountStore/getToken'])
-
+          await emit('closeLoginDialog')
           // console.log('accessToken ' + store.getters['accountStore/getToken'])
-                // Loading should be closed asynchronously
           loadingInstance.close()
         } else {
           alert('Validate error!')
         }
       });
-
     }
 
     const handleClose = function () {
@@ -129,7 +141,7 @@ export default {
       emit('closeLoginDialog')
     }
 
-    return { loginForm, state, clickLogin, handleClose }
+    return { loginForm, state, clickLogin, handleClose, onChange }
   }
 }
 </script>

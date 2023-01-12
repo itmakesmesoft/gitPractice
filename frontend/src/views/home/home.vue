@@ -38,17 +38,22 @@ import { ElLoading } from 'element-plus'
 
 export default {
   name: 'Home',
+
   components: {
     Conference
   },
+
   setup () {
     const router = useRouter()
+
     const state = reactive({
       count: 12
     })
+
     const load = function () {
       state.count += 4
     }
+
     const clickConference = function (id) {
       const loadingInstance = ElLoading.service({
         lock: true,
@@ -63,6 +68,7 @@ export default {
       })
       loadingInstance.close()
     }
+
     return { state, load, clickConference }
   }
 }

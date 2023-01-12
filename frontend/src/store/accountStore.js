@@ -1,24 +1,39 @@
 import {
   requestLogin,
   requestRegister,
-  requestMe
+  requestMe,
+  requestId,
 } from "../common/api/accountAPI";
 
 const state = {
-  token: null
+  token: null,
+  user: null,
+  checkId: true,
 };
 
 const getters = {
-  getToken: state => {
+  getToken: (state) => {
     return state.token;
-  }
+  },
+  getUser: (state) => {
+    return state.user;
+  },
+  getCheckId: (state) => {
+    return state.checkId;
+  },
 };
 
 const mutations = {
   setToken: (state, token) => {
     state.token = token;
     // console.log("loginACTINO", token);
-  }
+  },
+  setUser: (state, data) => {
+    state.user = data;
+  },
+  setCheckId: (state, checkId) => {
+    state.checkId = checkId;
+  },
 };
 
 const actions = {
@@ -50,10 +65,17 @@ const actions = {
       // console.log("token : ", token);
       const response = await requestMe(token);
       console.log("getMe : ", response);
+      commit("setUser", response);
     } catch (err) {
-      console.log(err);
+      console.log("111");
     }
-  }
+  },
+  idAction: async ({ commit }, idData) => {
+    console.log(idData, "------axios------");
+    const response = await requestId(idData);
+    console.log(response.data);
+    commit("setCheckId", response.data);
+  },
 };
 
 export default {
@@ -61,5 +83,5 @@ export default {
   state,
   getters,
   mutations,
-  actions
+  actions,
 };

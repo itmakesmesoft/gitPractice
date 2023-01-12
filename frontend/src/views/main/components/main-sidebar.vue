@@ -3,7 +3,19 @@
     class="main-sidebar"
     :gutter="10"
     :style="{ 'width': width }">
-    <div class="hide-on-small">
+    <div v-if="!isLogin" class="hide-on-small">
+      <el-menu
+        :default-active="String(state.activeIndex)"
+        active-text-color="#ffd04b"
+        class="el-menu-vertical-demo"
+        @select="menuSelect">
+        <el-menu-item v-for="(item, index) in state.menuItems.slice(0, 1)" :key="index" :index="index.toString()">
+          <i v-if="item.icon" :class="['ic', item.icon]"/>
+          <span>{{ item.title }}</span>
+        </el-menu-item>
+      </el-menu>
+    </div>
+    <div v-else class="hide-on-small">
       <el-menu
         :default-active="String(state.activeIndex)"
         active-text-color="#ffd04b"
@@ -54,7 +66,11 @@ export default {
   setup() {
     const store = useStore()
     const router = useRouter()
-
+    const isLogin = computed(() => {
+      let local = store.getters['accountStore/getToken']
+      // console.log(local)
+      return local
+    })
     const state = reactive({
       searchValue: null,
       menuItems: computed(() => {
@@ -82,20 +98,19 @@ export default {
       store.commit('menuStore/setMenuActive', param)
       const MenuItems = store.getters['menuStore/getMenus']
       let keys = Object.keys(MenuItems)
-
       const loadingInstance = ElLoading.service({
         lock: true,
         text: 'Loading',
         background: 'rgba(0, 0, 0, 0.7)',
       })
+
       router.push({
         name: keys[param]
       })
       loadingInstance.close()
-
     }
 
-    return { state, menuSelect }
+    return { state, menuSelect, isLogin }
   }
 }
 </script>

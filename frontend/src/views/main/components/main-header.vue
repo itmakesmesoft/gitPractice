@@ -19,6 +19,7 @@
           <el-button type="primary" @click="clickLogin">로그인</el-button>
         </div>
         <div v-else class="button-wrapper">
+          <!-- <el-button>{{ user.name }}님</el-button> -->
           <el-button type="primary" @click="clickLogout">로그아웃</el-button>
         </div>
       </div>
@@ -71,6 +72,10 @@ export default {
       let local = store.getters['accountStore/getToken']
       // console.log(local)
       return local
+    })
+    const user = computed(() => {
+      let getUser  = store.getters['accountStore/getUser']
+      return getUser
     })
     const state = reactive({
       searchValue: null,
@@ -129,7 +134,7 @@ export default {
       state.isCollapse = !state.isCollapse
     }
 
-    return { state, menuSelect, clickLogo, clickLogin, clickRegister, changeCollapse, clickLogout, isLogin }
+    return { state, menuSelect, clickLogo, clickLogin, clickRegister, changeCollapse, clickLogout, isLogin, user }
   }
 }
 </script>

@@ -1,12 +1,17 @@
+import VueAxios from "vue-axios";
+import axios from "axios";
+import store from "@/store/index.js";
 
-import VueAxios from 'vue-axios'
-import axios from 'axios'
 // import config from '../config'
 
-const BASE_URL = '/api/v1'
-const DEFAULT_ACCEPT_TYPE = 'application/json'
+const BASE_URL = "/api/v1";
+const DEFAULT_ACCEPT_TYPE = "application/json";
+let local = store.getters["accountStore/getToken"];
 
-axios.defaults.baseURL = BASE_URL
-axios.defaults.headers['Content-Type'] = DEFAULT_ACCEPT_TYPE
+axios.defaults.baseURL = BASE_URL;
+axios.defaults.headers["Content-Type"] = DEFAULT_ACCEPT_TYPE;
+if (local) {
+  axios.defaults.headers["Authorization"] = `Bearer ${local}`;
+}
 
-export default { VueAxios, axios }
+export default { VueAxios, axios };

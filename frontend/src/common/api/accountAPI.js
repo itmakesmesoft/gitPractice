@@ -10,11 +10,14 @@ const requestLogin = payload => $axios.post("/auth/login", payload);
 
 const requestRegister = payload => $axios.post("/users", payload);
 
-const requestMe = token => {
+const requestMe = async token => {
   console.log("getMeToken : ", token);
-  $axios.get("/users/me", {
-    headers: { Authorization: `Bearer ${token}` }
+  const getME = $axios.get("/users/me").then(res => {
+    return res.data;
   });
+  return getME;
 };
 
-export { requestLogin, requestRegister, requestMe };
+const requestId = payload => $axios.get("/", payload);
+
+export { requestLogin, requestRegister, requestId, requestMe };

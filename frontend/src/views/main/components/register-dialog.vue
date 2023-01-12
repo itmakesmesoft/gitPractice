@@ -11,8 +11,8 @@
         <el-input v-model="state.form.name" autocomplete="off"></el-input>
       </el-form-item>
       <el-form-item prop="id" label="아이디" :label-width="state.formLabelWidth" >
-        <el-input v-model="state.form.id" autocomplete="off"></el-input>
-        <!-- <el-button type="primary" @click="clickId">중복ID</el-button> -->
+        <el-input v-model="state.form.id" autocomplete="off" ref="idInput"></el-input>
+        <el-button type="primary" @click="clickId">중복ID</el-button>
       </el-form-item>
       <el-form-item prop="password" label="비밀번호" :label-width="state.formLabelWidth">
         <el-input v-model="state.form.password" autocomplete="off" show-password></el-input>
@@ -41,9 +41,6 @@
   float: right;
   width: 200px;
   display: inline-block;
-  border: 1px solid gray;
-  border-radius: 5x;
-  padding: 0px 0px 0px 5px;
 }
 .register-dialog .el-form-item {
   margin-bottom: 20px;
@@ -67,7 +64,7 @@
 <script>
 import { reactive, computed, ref, onMounted } from 'vue'
 import { useStore } from 'vuex'
-import { ElLoading, FormInstance } from 'element-plus'
+import { ElLoading } from 'element-plus'
 
 export default {
   name: 'register-dialog',
@@ -83,7 +80,7 @@ export default {
     const store = useStore()
     // 마운드 이후 바인딩 될 예정 - 컨텍스트에 노출시켜야함. <return>
     const registerForm = ref(null)
-    // const idInput = ref(null)
+    const idInput = ref(null)
 
     /*
       // Element UI Validator
@@ -98,7 +95,7 @@ export default {
         id: '',
         password: '',
         passwordCheck: '',
-        align: 'left'
+        align: 'left',
       },
       rules: {
         department: [
@@ -116,6 +113,7 @@ export default {
           { max: 16, message: '최대 30자까지 입력 가능합니다.', trigger: 'blur'}
         ],
         password: [
+<<<<<<< HEAD
           { required: true, message: '영문, 숫자, 특수문자가 조합되어야 합니다.',
               trigger: 'blur', validator (rule, value, callback) {
               if (/^.(?=^)(?=.\d)(?=.[a-zA-Z])(?=.[!@#$%^&+=]).*$/.test(value)) {
@@ -124,6 +122,16 @@ export default {
                 callback(new Error('영문, 숫자, 특수문자가 조합되어야 합니다.'))
               }
           }},
+=======
+          { trigger: 'blur', validator (rule, value, callback) {
+            if (/^.*(?=^)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/.test(value)) {
+              callback();
+            } else {
+              callback(new Error('비밀번호는 영문, 숫자, 특수문자가 조합되어야 합니다.'))
+            }
+          }},
+          { required: true, message: 'Please input password', trigger: 'blur' },
+>>>>>>> 583bb3334c647a5b63ea53f5a628fd3176978c2b
           { max: 16, message: '최대 16자까지 입력 가능합니다.', trigger: 'blur'},
           { min: 9, message: '최소 9자를 입력 해야합니다.', trigger: 'blur'}
         ],
@@ -142,18 +150,20 @@ export default {
       // console.log(registerForm.value)
     })
 
-    // const clickId = function () {
-    //   idInput.value.validate(async (valid) => {
-    //     if (valid) {
-    //       console.log('submit')
-    //       await store.dispatch('accountStore/idAction', { id: state.form.id})
-    //     }
-    //   })
-    // }
+    const clickId = function () {
+      console.log(store.getters['accountStore/getCheckId'],'---check----')
+      store.dispatch('accountStore/idAction', { id: state.form.id})
+      if (store.getters['accountStore/getCheckId']) {
+        alert('사용 가능한 아이디입니다.')
+      } else {
+        alert('이미 존재하는 아이디입니다.')
+      }
+    }
 
     const clickRegister = function () {
       // 로그인 클릭 시 validate 체크 후 그 결과 값에 따라, 로그인 API 호출 또는 경고창 표시
       registerForm.value.validate(async (valid) => {
+        console.log()
         if (valid) {
           const loadingInstance = ElLoading.service({
             lock: true,
@@ -161,13 +171,8 @@ export default {
             background: 'rgba(0, 0, 0, 0.7)',
           })
           console.log('submit')
-          await store.dispatch('accountStore/registerAction', {
-            id: state.form.id,
-            password: state.form.password,
-            name:state.form.name,
-            position: state.form.position,
-            department: state.form.department
-          })
+          await store.dispatch('accountStore/registerAction', { id: state.form.id, password: state.form.password, name:state.form.name, position: state.form.position, department: state.form.department })
+          await emit('closeRegisterDialog')
           loadingInstance.close()
         } else {
           alert('Validate error!')
@@ -184,7 +189,7 @@ export default {
       emit('closeRegisterDialog')
     }
 
-    return { registerForm, state, clickRegister, handleClose }
+    return { registerForm, idInput, state, clickRegister, clickId, handleClose }
   }
 }
 
